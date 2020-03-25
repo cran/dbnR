@@ -1,11 +1,11 @@
-b1b1a5c79ea73f013f3e28c77ee4de93 *DESCRIPTION
+aa0a28bf0be234a17dfceb08d16a8a51 *DESCRIPTION
 9d92d17f457de46658cc4efe6134a1da *NAMESPACE
-f2f6a308da5d8864a94d2abdd8f769e8 *NEWS.md
+95e4ac6a26a2972fef62493e4e3924ed *NEWS.md
 8fd363d4d7012e4c9c55db6ea04a3c26 *R/RcppExports.R
 ea9f83a86ae5d706660fca3634381d35 *R/Rcpp_init.R
 54ebf99394bede0eb8c7329fcfe96856 *R/dbn_inference.R
 65f01ff59a8830c845633034759e6c7d *R/dbn_learn.R
-4280d884bfbea6db7f4cf8b777ed02b2 *R/dbn_visualization.R
+85c27e7a113c44f40e540ce5fab8880f *R/dbn_visualization.R
 d245f999faedb8bde4b8370b6e095572 *R/dt_modification.R
 b34b433ba3f99c5adff72b78eb52878a *R/gauss_transform.R
 e39c1f93021d40121f93856248a422ba *R/init.R
