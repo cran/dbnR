@@ -65,8 +65,14 @@ logical_arg_check <- function(...){
 character_arg_check <- function(...){
   invisible(sapply(list(...), function(x){
     if(!is.character(x))
-      stop(sprintf("%s has to be of type chararter.", deparse(substitute(x))))
+      stop(sprintf("%s has to be of type character.", deparse(substitute(x))))
   }))
+}
+
+null_or_character_arg_check <- function(...){
+  if(!is.null(...)){
+    character_arg_check(...)
+  }
 }
 
 numeric_vector_check <- function(obj){
@@ -195,7 +201,7 @@ warn_empty_net <- function(obj){
 
 modes <- function(){
   ret <- c("exact",
-           "aprox")
+           "approx")
   return(ret)
 }
 
@@ -209,4 +215,9 @@ initial_attr_check <- function(fit){
     fit <- add_attr_to_fit(fit)
   
   return(fit)
+}
+
+obj_prov_check <- function(obj_vars, prov_ev){
+  if(any(obj_vars %in% prov_ev))
+    stop("some objective variables are also provided as evidence.")
 }

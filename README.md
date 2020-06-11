@@ -1,6 +1,11 @@
 
 <!-- README.md is generated from README.Rmd. Please edit that file -->
 
+[![CRAN Status
+Badge](https://www.r-pkg.org/badges/version/dbnR)](https://CRAN.R-project.org/package=dbnR)
+[![CRAN Downloads
+Badge](https://cranlogs.r-pkg.org/badges/grand-total/dbnR)](https://CRAN.R-project.org/package=dbnR)
+
 # dbnR
 
 An implementation of Gaussian dynamic Bayesian networks (GDBN) structure
@@ -16,14 +21,16 @@ implemented for GDBNs and bnlearn’s BNs via the visNetwork package
 
 ## Current development
 
-As of today (17/03/2020), the main functionality of the package is
-running and working. In order of importance, the primary objectives are:
+The main functionality of the package is running and working. In order
+of importance, the next objectives are:
 
-  - To add examples of the main functionality of the package and fix R
-    CMD checks in order to upload it to CRAN
-  - To add an automatically generated shiny interface of the net
-  - To run testing of some known unexpected behaviours on bn and dbn
-    prediction (e.g. providing all variables as objective variables)
+  - To add the possibility of giving evidence in each step of the
+    forecasting. This is useful when you want to fix the values of some
+    variables in the future or when you know beforehand what values are
+    they going to take.
+  - To add an automatically generated shiny interface of the net. This
+    makes interacting with the network easier and allows for simulation
+    prototypes.
   - To add the possibility of learning nets with only certain previous
     lags instead of all of them. For example, a dbn with only the time
     slices for t\_0 and t\_12, or one with t\_0, t\_3 and t\_4.
@@ -36,16 +43,18 @@ For now, the dbn.fit object as an extension of bnlearn’s bn.fit object
 will stay the same except for the “mu” and “sigma” attributes added to
 it. This way, it remains easy to call bnlearn’s methods on the dbn.fit
 object and I can store the MVN transformation inside the same object.
-Not an elegant solution, but its simplicity is enough.
+Not an elegant solution, but its simplicity is enough. What should be
+addressed is having to perform the folding of a dataset outside the
+predict function. The size of the network should be added as an
+attribute to avoid having having the user performing the folding.
 
 ## Getting Started
 
 ### Prerequisites
 
-This package requires R ≥ 3.6.1 to work properly. It’s possible to make
-it work for older versions of R and of each of the packages by fiddling
-with the [DESCRIPTION](DESCRIPTION) file, although this is not
-recommended.
+This package requires R ≥ 3.6.1 to work properly. It also works for R ≥
+3.5.0, the only difference is the color palette of the DBN visualization
+tool.
 
 The **bnlearn** and **data.table** packages, among others, are required
 for this package to work. They will be installed automatically when
@@ -62,7 +71,14 @@ use it.
 
 ### Installing
 
-As of today, the easiest way of installing dbnR is via the
+As of today, the easiest way of installing dbnR is via CRAN. To install
+it, simply run
+
+``` r
+install.packages('dbnR')
+```
+
+You can also install the lastest version in GitHub with the
 *install\_github* function in the **devtools** package. The commands you
 need to run are
 
