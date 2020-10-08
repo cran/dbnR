@@ -8,32 +8,33 @@ Badge](https://cranlogs.r-pkg.org/badges/grand-total/dbnR)](https://CRAN.R-proje
 
 # dbnR
 
-An implementation of Gaussian dynamic Bayesian networks (GDBN) structure
-learning and inference based on Marco Scutari’s package bnlearn
-(<http://www.bnlearn.com/>). The structure learning algorithm
-implemented is a variation on Ghada Trabelsi’s dynamic max-min hill
-climbing (<https://tel.archives-ouvertes.fr/tel-00996061/document>). The
-inference is performed either via the particle filtering offered by
+This package offers an implementation of Gaussian dynamic Bayesian
+networks (GDBN) structure learning and inference based partially on
+Marco Scutari’s package bnlearn (<https://www.bnlearn.com/>). It also
+allows the construction of higher-order DBNs. Two structure learning
+algorithm are implemented:
+
+  - A variation on Ghada Trabelsi’s dynamic max-min hill climbing
+    (<https://tel.archives-ouvertes.fr/tel-00996061/document>).
+  - A particle swarm optimization algorithm for higher-order DBNs
+    (<https://doi.org/10.1109/BRC.2014.6880957>)
+
+Inference is performed either via the particle filtering offered by
 bnlearn or by doing exact inference over the multivariate Gaussian
-equivalent of a net implemented in this package. A visualization tool is
-implemented for GDBNs and bnlearn’s BNs via the visNetwork package
-(<https://github.com/datastorm-open/visNetwork>).
+equivalent of a network implemented in this package. A visualization
+tool is also implemented for GDBNs and bnlearn’s BNs via the visNetwork
+package (<https://github.com/datastorm-open/visNetwork>).
 
 ## Current development
 
 The main functionality of the package is running and working. In order
 of importance, the next objectives are:
 
-  - To add the possibility of giving evidence in each step of the
-    forecasting. This is useful when you want to fix the values of some
-    variables in the future or when you know beforehand what values are
-    they going to take.
+  - To refractor the DMMHC algorithm into R6 for consistency with the
+    PSOHO algorithm and with any new structure learning algorithms.
   - To add an automatically generated shiny interface of the net. This
     makes interacting with the network easier and allows for simulation
     prototypes.
-  - To add the possibility of learning nets with only certain previous
-    lags instead of all of them. For example, a dbn with only the time
-    slices for t\_0 and t\_12, or one with t\_0, t\_3 and t\_4.
   - To provide a visualization tool of some sub-network. Many times, you
     end up with quite a big BN or DBN and you are interested in only a
     few of the nodes. We sketched a function to plot the Markov blanket
@@ -46,7 +47,7 @@ object and I can store the MVN transformation inside the same object.
 Not an elegant solution, but its simplicity is enough. What should be
 addressed is having to perform the folding of a dataset outside the
 predict function. The size of the network should be added as an
-attribute to avoid having having the user performing the folding.
+attribute to avoid having the user performing the folding.
 
 ## Getting Started
 
@@ -78,7 +79,7 @@ it, simply run
 install.packages('dbnR')
 ```
 
-You can also install the lastest version in GitHub with the
+You can also install the latest version in GitHub with the
 *install\_github* function in the **devtools** package. The commands you
 need to run are
 
@@ -109,7 +110,7 @@ The dt argument has to be either a data.frame or a data.table of numeric
 columns, in the example we use the sample dataset included in the
 package. The size argument determines the number of time slices that
 your net is going to have, that is, the Markovian order of the net. A
-Markovian order of 2 means that your data in the present is independent
+Markovian order of 1 means that your data in the present is independent
 of the past given the previous time slice. If your case doesn’t meet
 this criteria, the size of the net can be increased, to take into
 account more past time slices in the inference. In our function,
@@ -138,6 +139,10 @@ objective variables in each row. Forecasting to some horizon, on the
 other hand, tries to predict the behaviour in the future M instants
 given some initial evidence of the variables.
 
+There is an extensive example of how to use the package in the
+*markdowns* folder, which covers more advanced concepts of structure
+learning and inference.
+
 ## License
 
 This project is licensed under the GPL-3 License, following on bnlearn’s
@@ -145,8 +150,12 @@ GPL(≥ 2) license.
 
 ## References
 
-  - The bnlearn package (<http://www.bnlearn.com/>).
+  - The bnlearn package (<https://www.bnlearn.com/>).
   - The visNetwork package
     (<https://datastorm-open.github.io/visNetwork/>)
   - Kaggle’s dataset repository, where the sample dataset is from
     (<https://www.kaggle.com/wkirgsn/electric-motor-temperature>)
+  - Koller, D., & Friedman, N. (2009). *Probabilistic graphical models:
+    principles and techniques*. MIT press.
+  - Murphy, K. P. (2012). *Machine learning: a probabilistic
+    perspective*. MIT press.

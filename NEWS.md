@@ -1,3 +1,23 @@
+# dbnR 0.5.2
+
+* Fixed the visualization of dynamic networks with no intra-slice arcs. The nodes were plotted in a horizontal line, now they are shown in vertical lines in each time slice
+
+# dbnR 0.5.1
+
+* More extensive examples in markdowns/usage_example.Rmd
+* Fixed the test dataset
+* New learning algorithm present in the docs and readme
+
+# dbnR 0.5.0
+
+* Refractored the structure learning to accommodate multiple algorithms
+* Added a new particle swarm optimization structure learning algorithm (psoho)
+
+# dbnR 0.4.6
+
+* Dropped std:vector in favor of Rcpp::Numeric/StringVector in gauss_transform.cpp
+* Fixed a security check typo
+
 # dbnR 0.4.5
 
 * Fixed .Rbuildignore markdown and media folders

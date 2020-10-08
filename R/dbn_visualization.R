@@ -32,7 +32,6 @@ node_levels <- function(net, order, lvl = 1, acc = NULL){
 #' @examples 
 #' \donttest{
 #' dt_train <- dbnR::motor[200:2500]
-#' obj <- c("pm", "torque")
 #' net <- bnlearn::mmhc(dt_train)
 #' plot_network(net)
 #' fit <- bnlearn::bn.fit(net, dt_train, method = "mle")
@@ -155,6 +154,8 @@ plot_dynamic_network <- function(structure, offset = 200){
   # Static net positioning
   nodes_uniq <- dynamic_ordering(structure)
   levels <- node_levels(structure, nodes_uniq)
+  if(sum(as.numeric(levels[2,])) == dim(levels)[2]) # Fix for nets with no inter-slice arcs (PSOHO) and all nodes in a horizontal line
+    levels[2,] <- 1:dim(levels)[2]
   positions <- acc_successions(as.numeric(levels[2,]))
   n_nodes_slice <- length(nodes_uniq)
 
