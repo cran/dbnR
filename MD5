@@ -1,6 +1,6 @@
-4efba88ef57a1a9e883c4da504ae094f *DESCRIPTION
-9d92d17f457de46658cc4efe6134a1da *NAMESPACE
-5e198eb54905f1663886dc6ec100243a *NEWS.md
+abf64a95a63929a0790379d16678a420 *DESCRIPTION
+65c78bb5f4bc449e64b58d0d2f66dda4 *NAMESPACE
+52e8321627b1c92a385b039e93b2052b *NEWS.md
 730c30fd75126fe94a28487d3e4ad434 *R/RcppExports.R
 ea9f83a86ae5d706660fca3634381d35 *R/Rcpp_init.R
 77c8a51887b36d873ee02cd0cdcd97a0 *R/dbn_inference.R
@@ -13,7 +13,7 @@ bf020883d7b3f0e4789688884126de88 *R/motor_data.R
 24cfdb9d458b5866527f4aa8def8db56 *R/mvn_exact_inference.R
 854a74db354f0694cbb27c838e0e2ca0 *R/security_checks.R
 bae860a23c226b6f979f915de324caa3 *R/structure_learning_dmmhc.R
-3c68dbd3d3624d870d5fe0d658cfe75c *R/structure_learning_psoho.R
+5a21fb64aef089ca384f42c81406788a *R/structure_learning_psoho.R
 bdd350420f54fc7e5fe6f7642aced640 *R/utils.R
 718305ffafcb6ab7eca73913ece5c0d1 *README.md
 6585545355d433911560df6b7f3b7cd6 *data/motor.RData
