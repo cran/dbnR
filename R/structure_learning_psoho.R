@@ -78,7 +78,7 @@ Velocity <- R6::R6Class("Velocity",
     #' @param probs the weight of each value {-1,0,1}. They define the probability that each of them will be picked 
     #' @param seed the seed provided to the random number generation
     randomize_velocity = function(probs = c(10, 65, 25)){
-      numeric_prob_vector_check(probs)
+      numeric_prob_vector_check(probs, 3)
       directions <- randomize_vl_cpp(private$cl, probs)
       private$cl <- directions[[1]]
       private$abs_op <- directions[[2]]
@@ -91,8 +91,6 @@ Velocity <- R6::R6Class("Velocity",
     #' @param ps a Position object
     #' return the Velocity that gets this position to the new one
     subtract_positions = function(ps1, ps2){
-      initial_pos_2_pos_check(ps1, ps2$get_size(), ps2$get_ordering())
-      
       res <- pos_minus_pos_cpp(ps1$get_cl(), ps2$get_cl(), private$cl)
       
       private$cl <- res[[1]]
@@ -104,8 +102,6 @@ Velocity <- R6::R6Class("Velocity",
     #' 
     #' @param vl a Velocity object
     add_velocity = function(vl){
-      initial_vel_2_vel_check(vl, private$size, private$ordering)
-      
       res <- vel_plus_vel_cpp(private$cl, vl$get_cl(), private$abs_op)
       
       private$cl <- res[[1]]
@@ -202,8 +198,6 @@ Position <- R6::R6Class("Position",
     #' Given a Velocity object, add it to the current position.
     #' @param vl a Velocity object
     add_velocity = function(vl){
-      initial_vel_2_pos_check(vl, private$size, private$ordering)
-      
       res = pos_plus_vel_cpp(private$cl, vl$get_cl(), private$n_arcs)
       private$cl = res[[1]]
       private$n_arcs = res[[2]]
@@ -216,8 +210,6 @@ Position <- R6::R6Class("Position",
     #' @param ps a Position object
     #' return the Velocity that gets this position to the new one
     subtract_position = function(ps){
-      initial_pos_2_pos_check(ps, private$size, private$ordering)
-      
       res <- Velocity$new(private$ordering, private$size)
       res$subtract_positions(self, ps)
       
@@ -312,12 +304,15 @@ Particle <- R6::R6Class("Particle",
     #' Constructor of the 'Particle' class
     #' @param ordering a vector with the names of the nodes in t_0
     #' @param size number of timeslices of the DBN
+    #' @param v_probs vector that defines the random velocity initialization probabilities
+    #' @param score bnlearn score function used
     #' @return A new 'Particle' object
-    initialize = function(ordering, size, v_probs){
+    initialize = function(ordering, size, v_probs, score){
       private$ps <- Position$new(NULL, size, ordering)
       private$vl <- Velocity$new(private$ps$get_ordering(), size)
       private$vl$randomize_velocity(v_probs)
       private$lb <- -Inf
+      private$score <- score
     },
     
     #' @description 
@@ -329,7 +324,7 @@ Particle <- R6::R6Class("Particle",
     #' @return The score of the current position
     eval_ps = function(dt){
       struct <- private$ps$bn_translate()
-      score <- bnlearn::score(struct, dt, type = "bge") # For now, unoptimized bge. Any Gaussian score could be used
+      score <- bnlearn::score(struct, dt, type = private$score)
       if(score > private$lb){
         private$lb <- score 
         private$lb_ps <- private$ps
@@ -387,7 +382,9 @@ Particle <- R6::R6Class("Particle",
     #' @field lb local best score obtained
     lb = NULL,
     #' @field lb_ps local best position found
-    lb_ps = NULL
+    lb_ps = NULL,
+    #' @field score bnlearn score function used
+    score = NULL
   )
 )
 
@@ -409,16 +406,24 @@ PsoCtrl <- R6::R6Class("PsoCtrl",
    #' @param lb_cte parameter that varies the effect of the local best
    #' @param v_probs vector that defines the random velocity initialization probabilities
    #' @param r_probs vector that defines the range of random variation of gb_cte and lb_cte
+   #' @param score bnlearn score function used
+   #' @param cte a boolean that determines whether the parameters remain constant or vary as the algorithm progresses. The increases and decreases are calculated as a function of the total number of iterations, decreasing until close to 0 and increasing until close to 1.
    #' @return A new 'PsoCtrl' object
    initialize = function(ordering, size, n_inds, n_it, in_cte, gb_cte, lb_cte,
-                         v_probs, r_probs){
-     private$initialize_particles(ordering, size, n_inds, v_probs)
+                         v_probs, r_probs, score, cte){
+     private$initialize_particles(ordering, size, n_inds, v_probs, score)
      private$gb_scr <- -Inf
      private$n_it <- n_it
      private$in_cte <- in_cte
      private$gb_cte <- gb_cte
      private$lb_cte <- lb_cte
      private$r_probs <- r_probs
+     private$cte <- cte
+     if(!cte){
+       private$in_var <- in_cte / n_it # Decrease inertia
+       private$gb_var <- (1-gb_cte) / n_it # Increase gb
+       private$lb_var <- lb_cte / n_it # Decrease lb
+     }
    },
    
    #' @description 
@@ -443,6 +448,9 @@ PsoCtrl <- R6::R6Class("PsoCtrl",
        # Inside loop. Update each particle
        for(p in private$parts)
          p$update_state(private$in_cte, private$gb_cte, private$gb_ps, private$lb_cte, private$r_probs)
+       
+       if(!private$cte)
+         private$adjust_pso_parameters()
        
        private$evaluate_particles(dt)
        utils::setTxtProgressBar(pb, i)
@@ -469,6 +477,14 @@ PsoCtrl <- R6::R6Class("PsoCtrl",
    gb_scr = NULL,
    #' @field r_probs vector that defines the range of random variation of gb_cte and lb_cte
    r_probs = NULL,
+   #' @field cte boolean that defines whether the parameters remain constant or vary as the execution progresses
+   cte = NULL,
+   #' @field in_var decrement of the inertia each iteration
+   in_var = NULL,
+   #' @field gb_var increment of the global best parameter each iteration
+   gb_var = NULL,
+   #' @field lb_var increment of the local best parameter each iteration
+   lb_var = NULL,
    
    #' @description 
    #' Initialize the particles for the algorithm to random positions and velocities.
@@ -476,11 +492,12 @@ PsoCtrl <- R6::R6Class("PsoCtrl",
    #' @param size number of timeslices of the DBN
    #' @param n_inds number of particles that the algorithm will simultaneously process
    #' @param v_probs vector that defines the random velocity initialization probabilities
-   initialize_particles = function(ordering, size, n_inds, v_probs){
+   #' @param score bnlearn score function used
+   initialize_particles = function(ordering, size, n_inds, v_probs, score){
      #private$parts <- parallel::parLapply(private$cl,1:n_inds, function(i){Particle$new(ordering, size)})
      private$parts <- vector(mode = "list", length = n_inds)
      for(i in 1:n_inds)
-       private$parts[[i]] <- Particle$new(ordering, size, v_probs)
+       private$parts[[i]] <- Particle$new(ordering, size, v_probs, score)
    },
    
    #' @description 
@@ -494,6 +511,14 @@ PsoCtrl <- R6::R6Class("PsoCtrl",
          private$gb_ps <- p$get_ps()
        }
      }
+   },
+   
+   #' @description 
+   #' Modify the PSO parameters after each iteration
+   adjust_pso_parameters = function(){
+     private$in_cte <- private$in_cte - private$in_var
+     private$gb_cte <- private$gb_cte + private$gb_var
+     private$lb_cte <- private$lb_cte - private$lb_var
    }
   )
 )
@@ -505,7 +530,7 @@ PsoCtrl <- R6::R6Class("PsoCtrl",
 #' Given a dataset and the desired Markovian order, this function returns a DBN
 #' structure ready to be fitted. It requires a folded dataset.
 #' Original algorithm at https://doi.org/10.1109/BRC.2014.6880957
-#' @param dt a data.table with the data of the network to be trained. Previously folded with the 'dbnR' package or other means.
+#' @param dt a data.table with the data of the network to be trained
 #' @param size Number of timeslices of the DBN. Markovian order 1 equals size 2, and so on.
 #' @param n_inds Number of particles used in the algorithm.
 #' @param n_it Maximum number of iterations that the algorithm can perform.
@@ -514,19 +539,31 @@ PsoCtrl <- R6::R6Class("PsoCtrl",
 #' @param lb_cte parameter that varies the effect of the local best
 #' @param v_probs vector that defines the random velocity initialization probabilities
 #' @param r_probs vector that defines the range of random variation of gb_cte and lb_cte
-#' @return A 'bn' object with the structure of the best network found
-psoho <- function(dt, size, n_inds = 50, n_it = 50,
+#' @param f_dt previously folded dataset, in case some specific rows have to be removed after the folding
+#' @param score bnlearn score function used
+#' @param cte a boolean that determines whether the inertia, global best and local best parameters remain constant or vary as the algorithm progresses. Inertia and local best values decrease as the global best increases, to favor exploration at first and exploitation at the end.
+#' @return A 'dbn' object with the structure of the best network found
+psoho <- function(dt, size, f_dt = NULL, n_inds = 50, n_it = 50,
                                     in_cte = 1, gb_cte = 0.5, lb_cte = 0.5,
                                     v_probs = c(10, 65, 25), 
-                                    r_probs = c(-0.5, 1.5)){
-  #initial_psoho_check(n_inds, n_it,in_cte, gb_cte, lb_cte, v_probs,r_prob) --ICO-Merge
+                                    r_probs = c(-0.5, 1.5), score = "bge",
+                                    cte = TRUE){
+  numeric_arg_check(n_inds, n_it, in_cte, gb_cte, lb_cte)
+  numeric_prob_vector_check(v_probs, 3)
+  numeric_prob_vector_check(r_probs, 2)
+  logical_arg_check(cte)
   
-  ordering <- names(dt)
-  dt <- time_rename(dt)
-  f_dt <- fold_dt_rec(dt, names(dt), size)
+  if(is.null(f_dt)){
+    ordering <- names(dt)
+    dt <- time_rename(dt)
+    f_dt <- fold_dt_rec(dt, names(dt), size)
+  }
+  
+  else
+    ordering <- gsub("_t_0", "", grep("_t_0", names(f_dt), value = T))
   
   ctrl <- PsoCtrl$new(ordering, size, n_inds, n_it, in_cte, gb_cte, lb_cte,
-                      v_probs, r_probs)
+                      v_probs, r_probs, score, cte)
   ctrl$run(f_dt)
   
   net <- ctrl$get_best_network()

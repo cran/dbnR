@@ -49,7 +49,7 @@ numeric_arg_check <- function(...){
     if(!is.numeric(x))
       stop(sprintf("%s has to be numeric.", deparse(substitute(x))))
     if(length(x) > 1)
-      stop(sprintf("%s can not be a vector.", deparse(substitute(x))))
+      stop(sprintf("%s cannot be a vector.", deparse(substitute(x))))
   }))
 }
 
@@ -58,7 +58,7 @@ logical_arg_check <- function(...){
     if(!is.logical(x))
       stop(sprintf("%s has to be logical", deparse(substitute(x))))
     if(length(x) > 1)
-      stop(sprintf("%s can not be a vector.", deparse(substitute(x))))
+      stop(sprintf("%s cannot be a vector.", deparse(substitute(x))))
   }))
 }
 
@@ -224,23 +224,14 @@ obj_prov_check <- function(obj_vars, prov_ev){
 
 struc_learning_methods <- function(){
   ret <- c("dmmhc",
-           "psoho")
+           "psoho",
+           "natPsoho")
   return(ret)
 }
 
 initial_learning_method_check <- function(obj){
   if(!obj %in% struc_learning_methods())
     stop(paste("unknown structure learning method. Valid methods are:", Reduce(function(acu,x){paste(acu, x, sep = ", ")}, struc_learning_methods())))
-}
-
-is_causlist <- function(obj){
-  return(inherits(obj, "causlist"))
-}
-
-initial_causlist_check <- function(obj){
-  if(!is_causlist(obj))
-    stop(sprintf("%s must be of class 'causlist'.",
-                 deparse(substitute(obj))))
 }
 
 no_intraslice_check <- function(net){
@@ -263,40 +254,20 @@ initial_dbn_to_causlist_check <- function(obj){
   no_intraslice_check(obj)
 }
 
-numeric_prob_vector_check <- function(obj){
+numeric_prob_vector_check <- function(obj, l){
   if(!is.numeric(obj))
     stop(sprintf("%s has to be numeric.", deparse(substitute(obj))))
-  if(length(obj) != 3)
-    stop(sprintf("%s has to of length 3.", deparse(substitute(obj))))
-  # Not checking for positive numbers. Negative ones are also valid, although kind of useless.
+  if(length(obj) != l)
+    stop(sprintf("%s has to be of length %s.", deparse(substitute(obj)), l))
+  # Not checking for positive numbers. Negative ones are also valid.
 }
 
-initial_vel_2_pos_check <- function(vl, size, ordering){
-  if(vl$get_size() != size)
-    stop("The position and the velocity have different sizes.")
-  # The orderings must have unique nodes
-  sapply(vl$get_ordering(), function(x){
-    if(!(x %in% ordering))
-      stop("The position and the velocity have different nodes.")
-  })
+initial_null_dt_check <- function(dt, f_dt){
+  if(is.null(dt) && is.null(f_dt))
+    stop("both the provided dataset and folded dataset cannot be NULL at the same time.")
 }
 
-initial_pos_2_pos_check <- function(ps, size, ordering){
-  if(ps$get_size() != size)
-    stop("The two positions have different sizes.")
-  # The orderings must have unique nodes
-  sapply(ps$get_ordering(), function(x){
-    if(!(x %in% ordering))
-      stop("The two positions have different nodes.")
-  })
-}
-
-initial_vel_2_vel_check <- function(vl, size, ordering){
-  if(vl$get_size() != size)
-    stop("The two velocities have different sizes.")
-  # The orderings must have unique nodes
-  sapply(vl$get_ordering(), function(x){
-    if(!(x %in% ordering))
-      stop("The two velocities have different nodes.")
-  })
+dt_null_check <- function(dt, intra){
+  if(is.null(dt) && intra)
+    stop("the unfolded training dataset is NULL, so intra-slice arcs cannot be learnt.")
 }

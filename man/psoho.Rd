@@ -7,19 +7,24 @@
 psoho(
   dt,
   size,
+  f_dt = NULL,
   n_inds = 50,
   n_it = 50,
   in_cte = 1,
   gb_cte = 0.5,
   lb_cte = 0.5,
   v_probs = c(10, 65, 25),
-  r_probs = c(-0.5, 1.5)
+  r_probs = c(-0.5, 1.5),
+  score = "bge",
+  cte = TRUE
 )
 }
 \arguments{
-\item{dt}{a data.table with the data of the network to be trained. Previously folded with the 'dbnR' package or other means.}
+\item{dt}{a data.table with the data of the network to be trained}
 
 \item{size}{Number of timeslices of the DBN. Markovian order 1 equals size 2, and so on.}
+
+\item{f_dt}{previously folded dataset, in case some specific rows have to be removed after the folding}
 
 \item{n_inds}{Number of particles used in the algorithm.}
 
@@ -34,9 +39,13 @@ psoho(
 \item{v_probs}{vector that defines the random velocity initialization probabilities}
 
 \item{r_probs}{vector that defines the range of random variation of gb_cte and lb_cte}
+
+\item{score}{bnlearn score function used}
+
+\item{cte}{a boolean that determines whether the inertia, global best and local best parameters remain constant or vary as the algorithm progresses. Inertia and local best values decrease as the global best increases, to favor exploration at first and exploitation at the end.}
 }
 \value{
-A 'bn' object with the structure of the best network found
+A 'dbn' object with the structure of the best network found
 }
 \description{
 Given a dataset and the desired Markovian order, this function returns a DBN

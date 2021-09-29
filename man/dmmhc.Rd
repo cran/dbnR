@@ -4,14 +4,18 @@
 \alias{dmmhc}
 \title{Learns the structure of a markovian n DBN model from data}
 \usage{
-dmmhc(dt, size = 2, blacklist = NULL, ...)
+dmmhc(dt, size = 2, f_dt = NULL, blacklist = NULL, intra = TRUE, ...)
 }
 \arguments{
 \item{dt}{the data.frame or data.table to be used}
 
 \item{size}{number of time slices of the net. Markovian 1 would be size 2}
 
+\item{f_dt}{previously folded dataset, in case some specific rows have to be removed after the folding}
+
 \item{blacklist}{an optional matrix indicating forbidden arcs between nodes}
+
+\item{intra}{if TRUE, the intra-slice arcs of the network will be learnt. If FALSE, they will be ignored}
 
 \item{...}{additional parameters for \code{\link{rsmax2}} function}
 }

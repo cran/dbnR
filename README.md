@@ -1,12 +1,16 @@
 
 <!-- README.md is generated from README.Rmd. Please edit that file -->
 
+# dbnR
+
 [![CRAN Status
 Badge](https://www.r-pkg.org/badges/version/dbnR)](https://CRAN.R-project.org/package=dbnR)
 [![CRAN Downloads
 Badge](https://cranlogs.r-pkg.org/badges/grand-total/dbnR)](https://CRAN.R-project.org/package=dbnR)
+[![License: GPL
+v3](https://img.shields.io/badge/License-GPLv3-blue.svg)](https://www.gnu.org/licenses/gpl-3.0)
 
-# dbnR
+## Introduction
 
 This package offers an implementation of Gaussian dynamic Bayesian
 networks (GDBN) structure learning and inference based partially on
@@ -17,7 +21,10 @@ algorithm are implemented:
   - A variation on Ghada Trabelsi’s dynamic max-min hill climbing
     (<https://tel.archives-ouvertes.fr/tel-00996061/document>).
   - A particle swarm optimization algorithm for higher-order DBNs
-    (<https://doi.org/10.1109/BRC.2014.6880957>)
+    (<https://doi.org/10.1109/BRC.2014.6880957>)  
+  - A scalable, order invariant particle swarm optimization algorithm
+    for higher-order DBNs
+    (<https://link.springer.com/chapter/10.1007/978-3-030-86271-8_14>)
 
 Inference is performed either via the particle filtering offered by
 bnlearn or by doing exact inference over the multivariate Gaussian
@@ -114,8 +121,9 @@ Markovian order of 1 means that your data in the present is independent
 of the past given the previous time slice. If your case doesn’t meet
 this criteria, the size of the net can be increased, to take into
 account more past time slices in the inference. In our function,
-Markovian order = size - 1. The function returns a list with the learned
-structure and the folded dataset with the extended rows.
+Markovian order = size - 1. The function returns a ‘dbn’ object that
+inherits from the ‘bn’ class in *bnlearn*, so that its auxiliary
+functions like ‘arcs’ and such also work on DBN structures.
 
 Once the structure is learnt, it can be plotted and used to learn the
 parameters
@@ -159,3 +167,10 @@ GPL(≥ 2) license.
     principles and techniques*. MIT press.
   - Murphy, K. P. (2012). *Machine learning: a probabilistic
     perspective*. MIT press.
+
+## Applications of dbnR
+
+  - Quesada, D., Valverde, G., Larrañaga, P., & Bielza, C. (2021).
+    *Long-term forecasting of multivariate time series in industrial
+    furnaces with dynamic Gaussian Bayesian networks*. Engineering
+    Applications of Artificial Intelligence, 103, 104301.
