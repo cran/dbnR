@@ -4,7 +4,12 @@
 \alias{plot_dynamic_network}
 \title{Plots a dynamic Bayesian network in a hierarchical way}
 \usage{
-plot_dynamic_network(structure, offset = 200, subset_nodes = NULL)
+plot_dynamic_network(
+  structure,
+  offset = 200,
+  subset_nodes = NULL,
+  reverse = FALSE
+)
 }
 \arguments{
 \item{structure}{the structure or fit of the network.}
@@ -12,6 +17,11 @@ plot_dynamic_network(structure, offset = 200, subset_nodes = NULL)
 \item{offset}{the blank space between time slices}
 
 \item{subset_nodes}{a vector containing the names of the subset of nodes to plot}
+
+\item{reverse}{reverse to the classic naming convention of the nodes. 
+The oldest time-slice will now be t_0 and the most recent one t_n. 
+Only for visualization purposes, the network is unmodified underneath. If
+using subset_nodes, remember that t_0 is now the oldest time-slice.}
 }
 \value{
 the visualization of the DBN
@@ -22,7 +32,8 @@ for a time slice and replicates it for each slice. Then, it calculates the
 relative position of each node with respect to his equivalent in the first
 slice. The result is a net where each time slice is ordered and separated
 from one another, where the leftmost slice is the oldest and the rightmost
-represents the present time.
+represents the present time. This function is also called by the generic
+plot function of "dbn" and "dbn.fit" S3 objects.
 }
 \examples{
 \donttest{

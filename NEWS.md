@@ -1,3 +1,33 @@
+# dbnR 0.7.8
+
+* Bringing the package overall status up to scratch for publication on a journal.
+
+* Fixed incompatibility with bnlearn "mle-g" parameter.
+
+* Generic methods have been added for the "dbn" and "dbn.fit" S3 classes.
+
+* Documentation of the exported functions is now more accurate and follows a more stricter standard.
+
+* Non-exported functions are now excluded from the man pages.
+
+* Regular 'print' in low-level, internal functions has been swapped with 'cat'.
+
+* All of bnlearn methods for the classes "bn" and "bn.fit" have been extended to the "dbn" and "dbn.fit" classes in independent functions to ensure compatibility. All these methods are contained in the "bnlearn_compat.R" file.
+
+* Generalized matrix calculation now done with MASS::ginv
+
+# dbnR 0.7.7
+
+* New auxiliary function that moves the values of the variables backwards in time. Useful to shift the last row of evidence in a dataset and predict in a real world scenario.
+
+# dbnR 0.7.6
+
+* Added an option to reverse the naming convention of the nodes when plotting a DBN. It transforms t_0 into t_n, t_1 into t_n-1 and so on. In the literature, t_0 is the oldest time-slice, and we reversed that in dbnR. This option lets users plot the networks following convention, but changes nothing of the models underneath.
+
+* Fixed interaction between 'sapply' and some time series in the 'plot_single_result' function that caused the 'lines' function to take a very long time to execute.
+
+* Fixed plots not showing the predictions line when the predictions where outside the range of the original time series values.
+
 # dbnR 0.7.5
 
 * Deprecated the 'size' argument in 'forecast_ts' and 'smooth_ts'.
