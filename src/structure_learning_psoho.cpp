@@ -198,7 +198,7 @@ Rcpp::List init_list_cpp(Rcpp::StringVector nodes, unsigned int size, unsigned i
 //' Randomize a velocity with the given probabilities
 //' 
 //' @param vl a velocity list
-//' @param probs the probabilities of each value in the set {-1,0,1}
+//' @param probs the probabilities of each value in the set \{-1,0,1\}
 //' @return a velocity list with randomized values
 //' @keywords internal
 // [[Rcpp::export]]
@@ -269,7 +269,7 @@ Rcpp::List pos_minus_pos_cpp(Rcpp::List &cl, Rcpp::List &ps, Rcpp::List &vl){
 //' 
 //' @param vl1 the first Velocity's causal list
 //' @param vl2 the second Velocity's causal list
-//' @param abs_op the final number of {1,-1} operations
+//' @param abs_op the final number of \{1,-1\} operations
 //' @return a list with the Velocity's causal list and the number of operations
 //' @keywords internal
 // [[Rcpp::export]]
@@ -306,7 +306,7 @@ Rcpp::List vel_plus_vel_cpp(Rcpp::List &vl1, Rcpp::List &vl2, int abs_op){
 //' 
 //' @param k the constant real number
 //' @param vl the Velocity's causal list
-//' @param abs_op the final number of {1,-1} operations
+//' @param abs_op the final number of \{1,-1\} operations
 //' @param max_op the maximum number of directions in the causal list
 //' @return a list with the Velocity's new causal list and number of operations
 //' @keywords internal
@@ -408,11 +408,12 @@ Rcpp::StringVector rename_nodes_cpp(const Rcpp::StringVector &nodes, unsigned in
 // @param node a string with the name of the node
 // @return an integer with the time slice that the node belongs to
 int find_index(std::string node){
-  std::smatch m;
   int res;
+  std::string str_slice;
   
-  std::regex_match(node, m, std::regex(".*?([0-9]+)$"));
-  res = std::stoi(m.str(m.size() - 1));
+  StringVector crop_number = R_SUB("^.+_t_", "", node);
+  str_slice = crop_number[0];
+  res = std::stoi(str_slice);
   
   return res;
 }
@@ -423,14 +424,14 @@ int find_index(std::string node){
 // @param slice the new slice of the nodes
 // @return an integer with the time slice that the node belongs to
 Rcpp::StringVector rename_slices(const Rcpp::StringVector &nodes, unsigned int slice){
-  std::smatch m;
   std::string new_name;
-  Rcpp::StringVector res (nodes.size());
+  Rcpp::StringVector res (nodes.size()); 
+  Rcpp::StringVector crop_name;
   
   for(unsigned int i = 0; i < nodes.size(); i++){
     new_name = nodes[i];
-    std::regex_match(new_name, m, std::regex("(.+_t_)([0-9]+)"));
-    new_name = m[1];
+    crop_name = R_SUB("_[0-9]+$", "_", new_name);  // Using R regex motor instead of C++11 regex due to unstable behaviour
+    new_name = crop_name[0];
     new_name = new_name + std::to_string(slice);
     res[i] = new_name;
   }

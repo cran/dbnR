@@ -1,3 +1,13 @@
+# dbnR 0.7.9
+
+* Fixed unstable behaviour of regex in C++ on both the psoho and natPsoho algorithms.
+
+* Added a whitelist_tr argument to the DMMHC algorithm to allow forcing arcs in the transition network.
+
+* Fixed the 'forecast_ts' function so that when forecasting future values not present in the dataset having 'plot_res = T' doesn't throw an error
+
+* Removed C++11 specification
+
 # dbnR 0.7.8
 
 * Bringing the package overall status up to scratch for publication on a journal.
